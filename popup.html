@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SyncTime</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+
+    <!-- ── Header ──────────────────────────────────────────────────── -->
+    <header class="header">
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 5.5V10.5L13.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="brand-name">SyncTime</span>
+      </div>
+      <div class="header-right">
+        <button id="format-toggle" class="pill-btn" title="Toggle 12h / 24h">12h</button>
+        <div class="theme-group" role="group" aria-label="Theme">
+          <button class="theme-btn" data-theme="light" title="Light">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v1M8 13.5v1M14.5 8h-1M2.5 8h-1M12.3 3.7l-.7.7M4.4 11.6l-.7.7M12.3 12.3l-.7-.7M4.4 4.4l-.7-.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <button class="theme-btn active" data-theme="system" title="System">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 13.5h5M8 11.5v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <button class="theme-btn" data-theme="dark" title="Dark">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M13 8.5A5.5 5.5 0 017.5 3c-.17 0-.34.01-.5.03A5.5 5.5 0 1013 8.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── Cards ───────────────────────────────────────────────────── -->
+    <div id="cards" class="cards" role="list"></div>
+
+    <!-- ── Footer: Search + Copy All ──────────────────────────────── -->
+    <div class="footer">
+      <div class="search-wrap">
+        <button class="add-btn" id="search-toggle" title="Add timezone" aria-expanded="false">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Add
+        </button>
+        <div class="search-panel" id="search-panel" hidden>
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <input type="text" id="search-input" class="search-input" placeholder="City, country, or abbreviation…" autocomplete="off" spellcheck="false">
+            <button id="search-close" class="search-close" aria-label="Close search">
+              <svg viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div id="search-results" class="search-results" role="listbox"></div>
+        </div>
+      </div>
+      <button id="copy-all" class="pill-btn copy-all-btn" title="Copy all times to clipboard">
+        <svg viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10 4V3a1 1 0 00-1-1H3a1 1 0 00-1 1v8a1 1 0 001 1h1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Copy all
+      </button>
+    </div>
+
+    <!-- ── Converter ───────────────────────────────────────────────── -->
+    <div class="converter">
+      <div class="converter-row">
+        <svg class="conv-icon" viewBox="0 0 14 14" fill="none"><path d="M1 4.5h12M1 9.5h12M9 1.5l3 3-3 3M5 6.5L2 9.5l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="time" id="conv-time" class="conv-time" aria-label="Time to convert">
+        <span class="conv-label">in</span>
+        <select id="conv-from" class="conv-from" aria-label="Source timezone"></select>
+        <button id="conv-clear" class="conv-clear" title="Clear" hidden>
+          <svg viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div id="conv-hint" class="conv-hint"></div>
+    </div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
