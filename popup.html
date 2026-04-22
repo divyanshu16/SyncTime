@@ -34,6 +34,14 @@
       </div>
     </header>
 
+    <!-- ── Cards toolbar ────────────────────────────────────────────── -->
+    <div class="cards-toolbar">
+      <button id="sort-btn" class="sort-btn" title="Sort timezones">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M1 3.5h12M3 7h8M5 10.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span id="sort-label">Sort</span>
+      </button>
+    </div>
+
     <!-- ── Cards ───────────────────────────────────────────────────── -->
     <div id="cards" class="cards" role="list"></div>
 
@@ -71,6 +79,9 @@
         <button id="conv-clear" class="conv-clear" title="Clear" hidden>
           <svg viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         </button>
+      </div>
+      <div class="slider-row">
+        <input type="range" id="conv-slider" class="conv-slider" min="0" max="1439" step="1" aria-label="Drag to pick time">
       </div>
       <div id="conv-hint" class="conv-hint"></div>
     </div>

@@ -47,7 +47,7 @@ const TZ_DB = [
   { id: 'Africa/Johannesburg',            city: 'Johannesburg',       region: 'South Africa',       search: 'sast cape town' },
   { id: 'Africa/Casablanca',              city: 'Casablanca',         region: 'Morocco',            search: 'wet' },
   // South & Central Asia
-  { id: 'Asia/Kolkata',                   city: 'Mumbai / Delhi',     region: 'India (IST)',        search: 'ist india bangalore bengaluru hyderabad pune chennai kolkata' },
+  { id: 'Asia/Kolkata',                   city: 'Mumbai / Delhi',     region: 'India (IST)',        search: 'ist india delhi new delhi bangalore bengaluru hyderabad pune chennai kolkata' },
   { id: 'Asia/Colombo',                   city: 'Colombo',            region: 'Sri Lanka',          search: 'slst' },
   { id: 'Asia/Karachi',                   city: 'Karachi',            region: 'Pakistan',           search: 'pkt lahore islamabad' },
   { id: 'Asia/Dhaka',                     city: 'Dhaka',              region: 'Bangladesh',         search: 'bst' },
@@ -86,6 +86,7 @@ let state = {
   theme: 'system',
   format24h: false,
   converterFrom: '',
+  sortMode: 'custom',  // 'custom' | 'offset-asc' | 'offset-desc'
 };
 let convTime = '';   // HH:MM from <input type="time"> — not persisted
 
@@ -107,6 +108,7 @@ function load(cb) {
           if (parsed.theme === 'light' || parsed.theme === 'dark' || parsed.theme === 'system') state.theme = parsed.theme;
           if (typeof parsed.format24h === 'boolean') state.format24h = parsed.format24h;
           if (typeof parsed.converterFrom === 'string') state.converterFrom = parsed.converterFrom;
+          if (parsed.sortMode === 'offset-asc' || parsed.sortMode === 'offset-desc' || parsed.sortMode === 'custom') state.sortMode = parsed.sortMode;
         }
       } catch (_) {}
     }
@@ -288,7 +290,17 @@ function renderCards() {
     return;
   }
 
-  state.pinned.forEach(({ id: tzId, label }, idx) => {
+  // Apply sort (non-destructive — original order preserved in state.pinned)
+  let displayPinned = [...state.pinned];
+  if (state.sortMode !== 'custom') {
+    displayPinned = displayPinned.slice().sort((a, b) => {
+      const offA = parseOffsetMinutes(getOffsetStr(now, a.id));
+      const offB = parseOffsetMinutes(getOffsetStr(now, b.id));
+      return state.sortMode === 'offset-asc' ? offA - offB : offB - offA;
+    });
+  }
+
+  displayPinned.forEach(({ id: tzId, label }, idx) => {
     const info = tzInfo(tzId);
     const isLocal = tzId === localTz();
     const displayLabel = label || info.city;
@@ -306,8 +318,9 @@ function renderCards() {
 
     const card = document.createElement('div');
     card.className = `card ${cls}${isLocal ? ' local' : ''}`;
-    card.draggable = true;
+    card.draggable = state.sortMode === 'custom';
     card.dataset.idx = idx;
+    card.dataset.tzId = tzId;
 
     // Build DOM to avoid innerHTML with user-editable label
     card.innerHTML = `
@@ -463,27 +476,29 @@ function setupSearch() {
   function renderResults(q) {
     if (!q) { results.innerHTML = ''; return; }
     const lower = q.toLowerCase();
-    const matches = TZ_DB.filter(tz => {
-      if (state.pinned.some(p => p.id === tz.id)) return false;
-      return tz.city.toLowerCase().includes(lower) ||
-             tz.region.toLowerCase().includes(lower) ||
-             tz.search.includes(lower) ||
-             tz.id.toLowerCase().includes(lower);
-    }).slice(0, 7);
+    const allMatches = TZ_DB.filter(tz =>
+      tz.city.toLowerCase().includes(lower) ||
+      tz.region.toLowerCase().includes(lower) ||
+      tz.search.includes(lower) ||
+      tz.id.toLowerCase().includes(lower)
+    ).slice(0, 7);
 
-    if (!matches.length) {
+    if (!allMatches.length) {
       results.innerHTML = '<div class="no-results">No timezones found</div>';
       return;
     }
 
     const now = new Date();
     results.innerHTML = '';
-    matches.forEach((tz, i) => {
+    // Track which items are interactive (not already pinned) for keyboard nav
+    const interactiveIds = [];
+    allMatches.forEach((tz) => {
+      const isPinned = state.pinned.some(p => p.id === tz.id);
       const div = document.createElement('div');
-      div.className = 'search-result';
-      div.dataset.ridx = i;
+      div.className = 'search-result' + (isPinned ? ' already-added' : '');
       div.dataset.id = tz.id;
       div.setAttribute('role', 'option');
+      div.setAttribute('aria-disabled', isPinned ? 'true' : 'false');
       const abbr = getAbbr(now, tz.id);
       const time = fmtTime(now, tz.id, state.format24h);
       div.innerHTML = `
@@ -492,27 +507,32 @@ function setupSearch() {
           <div class="result-region"></div>
         </div>
         <div class="result-right">
-          <div class="result-time">${time}</div>
-          <div class="result-abbr">${abbr}</div>
+          ${isPinned ? '<div class="result-added">Added</div>' : `<div class="result-time">${time}</div><div class="result-abbr">${abbr}</div>`}
         </div>`;
       div.querySelector('.result-city').textContent = tz.city;
       div.querySelector('.result-region').textContent = tz.region;
-      div.addEventListener('click', () => addPin(tz.id));
+      if (!isPinned) {
+        div.addEventListener('click', () => addPin(tz.id));
+        interactiveIds.push(tz.id);
+      }
       results.appendChild(div);
     });
+    // Store interactive item ids for keyboard nav on the container
+    results.dataset.interactive = JSON.stringify(interactiveIds);
     focusedIdx = -1;
   }
 
   input.addEventListener('input', () => renderResults(input.value.trim()));
 
   input.addEventListener('keydown', e => {
-    const items = [...results.querySelectorAll('.search-result')];
+    const items = [...results.querySelectorAll('.search-result:not(.already-added)')];
     if (!items.length) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); focusedIdx = Math.min(focusedIdx+1, items.length-1); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); focusedIdx = Math.max(focusedIdx-1, 0); }
     else if (e.key === 'Enter' && focusedIdx >= 0) { e.preventDefault(); addPin(items[focusedIdx].dataset.id); return; }
     else if (e.key === 'Escape') { closeSearch(); return; }
-    items.forEach((it, i) => it.classList.toggle('focused', i === focusedIdx));
+    const allItems = [...results.querySelectorAll('.search-result')];
+    allItems.forEach(it => it.classList.toggle('focused', items.indexOf(it) === focusedIdx && focusedIdx >= 0));
   });
 }
 
@@ -578,16 +598,52 @@ function updateConverterHint() {
   hint.className = 'conv-hint active';
 }
 
+// Sync slider position from a HH:MM string (or clear if empty)
+function syncSliderFromTime(timeStr) {
+  const slider = document.getElementById('conv-slider');
+  if (!slider) return;
+  if (!timeStr) {
+    // Position slider at current local time when no conversion active
+    const now = new Date();
+    slider.value = now.getHours() * 60 + now.getMinutes();
+    return;
+  }
+  const [h, m] = timeStr.split(':').map(Number);
+  if (!isNaN(h) && !isNaN(m)) slider.value = h * 60 + m;
+}
+
+// Convert slider value (0-1439 minutes) to "HH:MM"
+function sliderValueToTime(val) {
+  const h = Math.floor(val / 60);
+  const m = val % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
 function setupConverter() {
   const timeInput = document.getElementById('conv-time');
   const fromSel = document.getElementById('conv-from');
   const clearBtn = document.getElementById('conv-clear');
+  const slider = document.getElementById('conv-slider');
 
   refreshConverterSelect();
+
+  // Set initial slider position to current local time
+  syncSliderFromTime('');
+
+  // Slider → time input sync
+  slider.addEventListener('input', () => {
+    const t = sliderValueToTime(parseInt(slider.value));
+    timeInput.value = t;
+    convTime = t;
+    clearBtn.hidden = false;
+    renderCards();
+    updateConverterHint();
+  });
 
   timeInput.addEventListener('input', () => {
     convTime = timeInput.value;
     clearBtn.hidden = !convTime;
+    syncSliderFromTime(convTime);
     renderCards();
     updateConverterHint();
   });
@@ -603,6 +659,7 @@ function setupConverter() {
     convTime = '';
     timeInput.value = '';
     clearBtn.hidden = true;
+    syncSliderFromTime('');
     renderCards();
     updateConverterHint();
   });
@@ -617,6 +674,7 @@ function setupConverter() {
       timeInput.value = parsed;
       convTime = parsed;
       clearBtn.hidden = false;
+      syncSliderFromTime(parsed);
       renderCards();
       updateConverterHint();
     }
@@ -632,6 +690,7 @@ function setupConverter() {
         timeInput.value = parsed;
         convTime = parsed;
         clearBtn.hidden = false;
+        syncSliderFromTime(parsed);
         renderCards();
         updateConverterHint();
       }
@@ -662,6 +721,31 @@ function parseTimeText(text) {
   if (period === 'am' && h === 12) h = 0;
   if (h > 23) return null;
   return `${String(h).padStart(2,'0')}:00`;
+}
+
+// ── Sort ───────────────────────────────────────────────────────────────────
+function setupSort() {
+  const btn = document.getElementById('sort-btn');
+  const lbl = document.getElementById('sort-label');
+  if (!btn) return;
+
+  const modes = ['custom', 'offset-asc', 'offset-desc'];
+  const labels = { 'custom': 'Sort', 'offset-asc': 'UTC ↑', 'offset-desc': 'UTC ↓' };
+
+  function updateSortUI() {
+    lbl.textContent = labels[state.sortMode] || 'Sort';
+    btn.classList.toggle('active', state.sortMode !== 'custom');
+  }
+
+  updateSortUI();
+
+  btn.addEventListener('click', () => {
+    const idx = modes.indexOf(state.sortMode);
+    state.sortMode = modes[(idx + 1) % modes.length];
+    save();
+    updateSortUI();
+    renderCards();
+  });
 }
 
 // ── Copy All ───────────────────────────────────────────────────────────────
@@ -735,6 +819,7 @@ function init() {
   }
 
   renderCards();
+  setupSort();
   setupSearch();
   setupConverter();
   setupCopyAll();
