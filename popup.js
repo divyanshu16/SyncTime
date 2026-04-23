@@ -219,6 +219,47 @@ function convertedDate(timeStr, fromTzId) {
   } catch (_) { return null; }
 }
 
+// ── Sky gradient helpers ───────────────────────────────────────────────────
+// Anchor stops mapping hour → [top-color, bottom-color] of the card gradient
+const SKY_STOPS = [
+  { h:  0, a: '#050618', b: '#0c0d2a' },
+  { h:  4, a: '#030410', b: '#07081e' },
+  { h:  5, a: '#0e082c', b: '#220c46' },
+  { h:  6, a: '#481060', b: '#c04438' },
+  { h:  7, a: '#d25820', b: '#f8a028' },
+  { h:  8, a: '#f8be58', b: '#78c0e8' },
+  { h:  9, a: '#48a4de', b: '#84c4f8' },
+  { h: 12, a: '#2488cc', b: '#54aee4' },
+  { h: 16, a: '#2c8cc8', b: '#84c0e8' },
+  { h: 17, a: '#38a0d8', b: '#d8be58' },
+  { h: 18, a: '#c46028', b: '#f09038' },
+  { h: 19, a: '#9c2838', b: '#d83828' },
+  { h: 20, a: '#4c1844', b: '#682050' },
+  { h: 21, a: '#140830', b: '#220c48' },
+  { h: 22, a: '#08060c', b: '#0e0a22' },
+  { h: 24, a: '#050618', b: '#0c0d2a' },
+];
+function _hr(h) { return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+function _lh(a, b, t) {
+  const [ar,ag,ab]=_hr(a),[br,bg,bb]=_hr(b);
+  return '#'+[ar+t*(br-ar),ag+t*(bg-ag),ab+t*(bb-ab)].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+}
+function skyGradient(hour) {
+  let lo=SKY_STOPS[0], hi=SKY_STOPS[SKY_STOPS.length-1];
+  for (let i=0; i<SKY_STOPS.length-1; i++) {
+    if (hour>=SKY_STOPS[i].h && hour<SKY_STOPS[i+1].h) { lo=SKY_STOPS[i]; hi=SKY_STOPS[i+1]; break; }
+  }
+  const t=(lo.h===hi.h)?0:(hour-lo.h)/(hi.h-lo.h);
+  return `linear-gradient(155deg,${_lh(lo.a,hi.a,t)} 0%,${_lh(lo.b,hi.b,t)} 100%)`;
+}
+function skyHour(date, tzId) {
+  try {
+    return parseInt(new Intl.DateTimeFormat('en-US',{timeZone:tzId,hour:'numeric',hourCycle:'h23'}).format(date),10);
+  } catch(_) { return 12; }
+}
+// Returns true when the sky is bright enough to need dark text (8am–5pm)
+function skyIsLight(hour) { return hour>=8 && hour<17; }
+
 // Day difference relative to source timezone "today"
 function dayDiff(convDate, targetTzId, fromTzId) {
   try {
@@ -308,38 +349,45 @@ function renderCards() {
     const timeStr = fmtTime(displayDate, tzId, state.format24h);
     const dateStr = fmtDate(displayDate, tzId);
     const relOff = relativeOffset(now, tzId);
-    const { emoji, cls } = statusFor(displayDate, tzId);
+    const { cls } = statusFor(displayDate, tzId);
     const dd = isConverting ? dayDiff(convDate, tzId, fromTz) : 0;
     const ddHtml = dd > 0
-      ? `<span class="card-daydiff next">+${dd}d</span>`
+      ? `<span class="card-daydiff">+${dd}d</span>`
       : dd < 0
-        ? `<span class="card-daydiff prev">${dd}d</span>`
+        ? `<span class="card-daydiff">${dd}d</span>`
         : '';
+
+    // Sky gradient — color shifts as you drag the time slider
+    const hr = skyHour(displayDate, tzId);
+    const light = skyIsLight(hr);
 
     const card = document.createElement('div');
     card.className = `card ${cls}${isLocal ? ' local' : ''}`;
     card.draggable = state.sortMode === 'custom';
     card.dataset.idx = idx;
     card.dataset.tzId = tzId;
+    card.style.background = skyGradient(hr);
+    card.style.setProperty('--ctxt',   light ? '#0a1628' : '#ffffff');
+    card.style.setProperty('--ctxt-m', light ? 'rgba(10,22,40,0.5)' : 'rgba(255,255,255,0.5)');
 
-    // Build DOM to avoid innerHTML with user-editable label
     card.innerHTML = `
       <button class="card-remove" data-tz="${tzId}" aria-label="Remove">
-        <svg viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
-      <div class="card-status">${emoji}</div>
-      <div class="card-label-row">
-        <span class="card-label" contenteditable="true" spellcheck="false" data-tz="${tzId}" title="Double-click to rename"></span>
-        <span class="card-abbr">${abbr}</span>
-        ${isLocal ? '<span class="card-local-badge">YOU</span>' : ''}
-      </div>
-      <div class="card-date">${dateStr}</div>
-      <div class="card-time-col">
-        <span class="card-time${isConverting ? ' is-converted' : ''}" data-tz="${tzId}" data-time="${timeStr}">${timeStr}</span>
-        <div class="card-time-meta">
-          <span class="card-offset">${relOff}</span>
-          ${ddHtml}
+      <div class="card-head">
+        <span class="card-label" contenteditable="true" spellcheck="false" data-tz="${tzId}" title="Click to rename"></span>
+        <div class="card-head-r">
+          ${isLocal ? '<span class="card-local-badge">YOU</span>' : ''}
+          <span class="card-abbr">${abbr}</span>
         </div>
+      </div>
+      <div class="card-body">
+        <span class="card-time${isConverting ? ' is-converted' : ''}" data-tz="${tzId}" data-time="${timeStr}">${timeStr}</span>
+        ${ddHtml}
+      </div>
+      <div class="card-foot">
+        <span class="card-date">${dateStr}</span>
+        <span class="card-offset">${relOff}</span>
       </div>`;
 
     // Set label text safely (no XSS)
