@@ -260,6 +260,15 @@ function skyHour(date, tzId) {
 // Returns true when the sky is bright enough to need dark text (8am–5pm)
 function skyIsLight(hour) { return hour>=8 && hour<17; }
 
+// Get time as "HH:MM" (24h) in a given timezone — used for inline editing
+function get24hTime(date, tzId) {
+  try {
+    const h = parseInt(new Intl.DateTimeFormat('en-US',{timeZone:tzId,hour:'numeric',hourCycle:'h23'}).format(date),10);
+    const m = parseInt(new Intl.DateTimeFormat('en-US',{timeZone:tzId,minute:'numeric'}).format(date),10);
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  } catch(_) { return '00:00'; }
+}
+
 // Day difference relative to source timezone "today"
 function dayDiff(convDate, targetTzId, fromTzId) {
   try {
@@ -360,9 +369,13 @@ function renderCards() {
     // Sky gradient — color shifts as you drag the time slider
     const hr = skyHour(displayDate, tzId);
     const light = skyIsLight(hr);
+    const skyClass = hr >= 6 && hr < 9 ? 'sky-dawn'
+                   : hr >= 9 && hr < 17 ? 'sky-day'
+                   : hr >= 17 && hr < 20 ? 'sky-dusk'
+                   : 'sky-night';
 
     const card = document.createElement('div');
-    card.className = `card ${cls}${isLocal ? ' local' : ''}`;
+    card.className = `card ${cls}${isLocal ? ' local' : ''} ${skyClass}`;
     card.draggable = state.sortMode === 'custom';
     card.dataset.idx = idx;
     card.dataset.tzId = tzId;
@@ -413,12 +426,49 @@ function attachCardHandlers(container) {
     });
   });
 
-  // Click time → copy
+  // Click time → inline edit: set this TZ as converter source, all cards update
   container.querySelectorAll('.card-time').forEach(el => {
+    el.title = 'Click to set time here';
     el.addEventListener('click', () => {
-      copyText(el.dataset.time, el);
+      const tzId = el.dataset.tz;
+      const fromTz = state.converterFrom || localTz();
+      const now = new Date();
+      const convDate = convertedDate(convTime, fromTz);
+      const currentDisplay = convDate || now;
+
+      // Pre-fill with the currently displayed time for this TZ
+      const initVal = get24hTime(currentDisplay, tzId);
+
+      // Replace the span with an inline time input
+      const input = document.createElement('input');
+      input.type = 'time';
+      input.value = initVal;
+      input.className = 'card-time-edit';
+      el.replaceWith(input);
+      input.focus();
+
+      const applyEdit = (val) => {
+        if (!val) { renderCards(); return; }
+        const timeInput = document.getElementById('conv-time');
+        const fromSel   = document.getElementById('conv-from');
+        const clearBtn  = document.getElementById('conv-clear');
+        state.converterFrom = tzId;
+        convTime = val;
+        if (timeInput) timeInput.value = val;
+        if (fromSel)   fromSel.value   = tzId;
+        if (clearBtn)  clearBtn.hidden  = false;
+        syncSliderFromTime(val);
+        renderCards();
+        updateConverterHint();
+      };
+
+      input.addEventListener('input',   () => applyEdit(input.value));
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter')  { e.preventDefault(); applyEdit(input.value); }
+        if (e.key === 'Escape') { renderCards(); }
+      });
+      input.addEventListener('blur', () => applyEdit(input.value));
     });
-    el.title = 'Click to copy';
   });
 
   // Label inline rename
@@ -675,8 +725,20 @@ function setupConverter() {
 
   refreshConverterSelect();
 
-  // Set initial slider position to current local time
-  syncSliderFromTime('');
+  // Pre-fill converter with current local time so new users see it's interactive
+  const initNow = new Date();
+  const initDefault = `${String(initNow.getHours()).padStart(2,'0')}:${String(initNow.getMinutes()).padStart(2,'0')}`;
+  if (!convTime) {
+    timeInput.value = initDefault;
+    // Don't set convTime yet — user hasn't changed anything, live times still show
+    // Slider shows current position
+    syncSliderFromTime(initDefault);
+  } else {
+    // Restore previous converter state
+    timeInput.value = convTime;
+    syncSliderFromTime(convTime);
+    clearBtn.hidden = false;
+  }
 
   // Slider → time input sync
   slider.addEventListener('input', () => {
@@ -841,18 +903,23 @@ function init() {
   });
   applyTheme(state.theme);
 
-  // Format toggle
-  const fmtBtn = document.getElementById('format-toggle');
-  fmtBtn.textContent = state.format24h ? '24h' : '12h';
-  fmtBtn.classList.toggle('active', state.format24h);
-  fmtBtn.addEventListener('click', () => {
-    state.format24h = !state.format24h;
-    fmtBtn.textContent = state.format24h ? '24h' : '12h';
-    fmtBtn.classList.toggle('active', state.format24h);
-    save();
-    renderCards();
-    refreshConverterSelect();
-    updateConverterHint();
+  // Format toggle — segmented 12h / 24h control
+  const fmt12Btn = document.getElementById('fmt-12h');
+  const fmt24Btn = document.getElementById('fmt-24h');
+  function updateFmtBtns() {
+    fmt12Btn.classList.toggle('active', !state.format24h);
+    fmt24Btn.classList.toggle('active',  state.format24h);
+  }
+  updateFmtBtns();
+  fmt12Btn.addEventListener('click', () => {
+    if (state.format24h) {
+      state.format24h = false; updateFmtBtns(); save(); renderCards(); refreshConverterSelect(); updateConverterHint();
+    }
+  });
+  fmt24Btn.addEventListener('click', () => {
+    if (!state.format24h) {
+      state.format24h = true; updateFmtBtns(); save(); renderCards(); refreshConverterSelect(); updateConverterHint();
+    }
   });
 
   // Default pins on first run

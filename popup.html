@@ -19,7 +19,10 @@
         <span class="brand-name">SyncTime</span>
       </div>
       <div class="header-right">
-        <button id="format-toggle" class="pill-btn" title="Toggle 12h / 24h">12h</button>
+        <div class="format-group" role="group" aria-label="Time format">
+          <button class="format-btn" id="fmt-12h" title="12-hour format">12h</button>
+          <button class="format-btn" id="fmt-24h" title="24-hour format">24h</button>
+        </div>
         <div class="theme-group" role="group" aria-label="Theme">
           <button class="theme-btn" data-theme="light" title="Light">
             <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v1M8 13.5v1M14.5 8h-1M2.5 8h-1M12.3 3.7l-.7.7M4.4 11.6l-.7.7M12.3 12.3l-.7-.7M4.4 4.4l-.7-.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>

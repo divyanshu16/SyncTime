@@ -91,6 +91,34 @@ body {
 
 .header-right { display: flex; align-items: center; gap: 5px; }
 
+/* ── Format group (segmented 12h / 24h) ────────────────────── */
+.format-group {
+  display: flex;
+  background: var(--bg-sub);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.format-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  height: 26px;
+  background: none;
+  border: none;
+  color: var(--t2);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+.format-btn:not(:last-child) { border-right: 1px solid var(--border); }
+.format-btn:hover { background: var(--bg-hover); color: var(--t1); }
+.format-btn.active { background: var(--accent-soft); color: var(--accent); }
+
 /* ── Pill button ───────────────────────────────────────────── */
 .pill-btn {
   display: inline-flex;
@@ -320,6 +348,81 @@ body {
   text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 
+/* ── Sky patterns (decorative ::after overlay) ──────────────── */
+/* Night → stars */
+.sky-night::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle 1px at  8% 18%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(circle 1px at 22% 38%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 38% 12%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(circle 1px at 54% 28%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(circle 1px at 68% 18%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 82% 35%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(circle 1px at 93% 14%, rgba(255,255,255,0.65) 0%, transparent 100%),
+    radial-gradient(circle 1px at 14% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(circle 1px at 46% 60%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(circle 1px at 74% 52%, rgba(255,255,255,0.45) 0%, transparent 100%),
+    radial-gradient(circle 1px at 30% 72%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(circle 1px at 62% 76%, rgba(255,255,255,0.55) 0%, transparent 100%),
+    radial-gradient(circle 1px at 88% 68%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(circle 1px at  4% 82%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(circle 1px at 50% 88%, rgba(255,255,255,0.25) 0%, transparent 100%);
+}
+
+/* Dawn (6-9am) → soft clouds */
+.sky-dawn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 70px 22px at 28% 48%, rgba(255,255,255,0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 40px 14px at 50% 38%, rgba(255,255,255,0.2)  0%, transparent 70%),
+    radial-gradient(ellipse 50px 16px at 72% 55%, rgba(255,255,255,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 30px 10px at 18% 62%, rgba(255,255,255,0.15) 0%, transparent 70%);
+}
+
+/* Day (9am-5pm) → sun + clouds */
+.sky-day::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image:
+    /* Sun glow */
+    radial-gradient(circle 20px at 86% 22%, rgba(255,238,80,0.65) 0%, rgba(255,238,80,0.15) 45%, transparent 65%),
+    /* Sun rays (subtle) */
+    radial-gradient(ellipse 4px 28px at 86% 22%, rgba(255,238,80,0.12) 0%, transparent 100%),
+    radial-gradient(ellipse 28px 4px at 86% 22%, rgba(255,238,80,0.12) 0%, transparent 100%),
+    /* Clouds */
+    radial-gradient(ellipse 55px 18px at 22% 42%, rgba(255,255,255,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 35px 12px at 42% 32%, rgba(255,255,255,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 45px 14px at 62% 52%, rgba(255,255,255,0.15) 0%, transparent 70%);
+}
+
+/* Dusk (5-8pm) → warm sunset clouds */
+.sky-dusk::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image:
+    /* Setting sun */
+    radial-gradient(circle 12px at 82% 60%, rgba(255,180,40,0.55) 0%, rgba(255,180,40,0.12) 40%, transparent 65%),
+    /* Warm clouds */
+    radial-gradient(ellipse 65px 20px at 18% 50%, rgba(255,190,120,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 45px 14px at 48% 42%, rgba(255,200,140,0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 35px 12px at 68% 58%, rgba(255,180,110,0.14) 0%, transparent 70%);
+}
+
 /* ── Remove button ──────────────────────────────────────────── */
 .card-remove {
   position: absolute;
@@ -330,18 +433,35 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.28);
+  background: rgba(0,0,0,0.22);
   border: none;
   border-radius: 50%;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.5);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.12s, background 0.12s;
+  opacity: 0.4;           /* always visible, subtle */
+  transition: opacity 0.12s, background 0.12s, color 0.12s;
   padding: 0;
 }
 .card-remove svg { width: 8px; height: 8px; }
-.card:hover .card-remove { opacity: 1; }
-.card-remove:hover { background: rgba(210,40,40,0.7); color: #fff; }
+.card:hover .card-remove { opacity: 1; color: rgba(255,255,255,0.8); }
+.card-remove:hover { background: rgba(210,40,40,0.7) !important; color: #fff !important; opacity: 1 !important; }
+
+/* ── Inline time edit on card ───────────────────────────────── */
+.card-time-edit {
+  background: rgba(255,255,255,0.18);
+  border: 1.5px solid rgba(255,255,255,0.5);
+  border-radius: 6px;
+  color: var(--ctxt, #fff);
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 300;
+  padding: 2px 6px;
+  outline: none;
+  width: 130px;
+  cursor: text;
+  caret-color: var(--ctxt, #fff);
+}
+.card-time-edit::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
 
 /* ── Empty state ───────────────────────────────────────────── */
 .empty-state {
