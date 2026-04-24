@@ -610,6 +610,8 @@ function setupDragAndDrop() {
 
   cards.forEach(card => {
     card.addEventListener('dragstart', e => {
+      // Don't drag when the user is clicking the remove button
+      if (e.target.closest('.card-remove')) { e.preventDefault(); return; }
       dragIdx = parseInt(card.dataset.idx);
       e.dataTransfer.effectAllowed = 'move';
       setTimeout(() => card.classList.add('dragging'), 0);
