@@ -609,12 +609,15 @@ function setupDragAndDrop() {
   let dragIdx = null;
 
   cards.forEach(card => {
-    // Disable drag temporarily when pressing the remove button so the browser
-    // never enters the drag path and suppresses the click event.
+    // Disable drag for the full press when the user presses the remove button.
+    // setTimeout(0) restores too early (before mouseup), so we restore on mouseup
+    // at the document level instead, covering hold-and-release and slow clicks.
     card.addEventListener('mousedown', e => {
       if (e.target.closest('.card-remove')) {
         card.draggable = false;
-        setTimeout(() => { card.draggable = state.sortMode === 'custom'; }, 0);
+        document.addEventListener('mouseup', () => {
+          card.draggable = state.sortMode === 'custom';
+        }, { once: true });
       }
     });
     card.addEventListener('dragstart', e => {
