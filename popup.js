@@ -519,18 +519,18 @@ function renderCards() {
 }
 
 function attachCardHandlers(container) {
-  // Remove buttons
-  container.querySelectorAll('.card-remove').forEach(btn => {
-    // Stop mousedown propagation so the card's drag handler doesn't eat the click
-    btn.addEventListener('mousedown', e => e.stopPropagation());
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const tzId = btn.dataset.tz;
-      state.pinned = state.pinned.filter(p => p.id !== tzId);
-      save();
-      renderCards();
-      refreshConverterSelect();
-    });
+  // Remove buttons — use event delegation on the container so z-index/stacking
+  // issues on the button itself cannot block the click from reaching a handler.
+  container.addEventListener('click', e => {
+    const btn = e.target.closest('.card-remove');
+    if (!btn) return;
+    e.stopPropagation();
+    const tzId = btn.dataset.tz;
+    if (!tzId) return;
+    state.pinned = state.pinned.filter(p => p.id !== tzId);
+    save();
+    renderCards();
+    refreshConverterSelect();
   });
 
   // Click time → inline edit: set this TZ as converter source, all cards update
@@ -554,7 +554,11 @@ function attachCardHandlers(container) {
       el.replaceWith(input);
       input.focus();
 
+      // One-shot guard: prevents double-apply when Enter triggers blur
+      let _editApplied = false;
       const applyEdit = (val) => {
+        if (_editApplied) return;
+        _editApplied = true;
         if (!val) { renderCards(); return; }
         const timeInput = document.getElementById('conv-time');
         const fromSel   = document.getElementById('conv-from');
@@ -569,10 +573,12 @@ function attachCardHandlers(container) {
         updateConverterHint();
       };
 
-      input.addEventListener('change', () => applyEdit(input.value));
+      // Only apply when the user explicitly commits (Enter or click away).
+      // Removed 'change' listener — it fires as soon as one field (hours) is
+      // changed to a valid value, destroying the input before the user finishes.
       input.addEventListener('keydown', e => {
         if (e.key === 'Enter')  { e.preventDefault(); applyEdit(input.value); }
-        if (e.key === 'Escape') { renderCards(); }
+        if (e.key === 'Escape') { _editApplied = true; renderCards(); }
       });
       input.addEventListener('blur', () => applyEdit(input.value));
     });
