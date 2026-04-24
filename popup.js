@@ -609,9 +609,15 @@ function setupDragAndDrop() {
   let dragIdx = null;
 
   cards.forEach(card => {
+    // Disable drag temporarily when pressing the remove button so the browser
+    // never enters the drag path and suppresses the click event.
+    card.addEventListener('mousedown', e => {
+      if (e.target.closest('.card-remove')) {
+        card.draggable = false;
+        setTimeout(() => { card.draggable = state.sortMode === 'custom'; }, 0);
+      }
+    });
     card.addEventListener('dragstart', e => {
-      // Don't drag when the user is clicking the remove button
-      if (e.target.closest('.card-remove')) { e.preventDefault(); return; }
       dragIdx = parseInt(card.dataset.idx);
       e.dataTransfer.effectAllowed = 'move';
       setTimeout(() => card.classList.add('dragging'), 0);
