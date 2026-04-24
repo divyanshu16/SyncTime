@@ -201,7 +201,7 @@ body {
   flex-direction: column;
   gap: 7px;
   overflow-y: auto;
-  max-height: 360px;
+  max-height: 420px;
 }
 .cards::-webkit-scrollbar { width: 3px; }
 .cards::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 3px; }
@@ -211,6 +211,7 @@ body {
   /* background set inline as sky gradient */
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;   /* never squish cards when many are shown */
   gap: 2px;
   padding: 10px 12px 9px;
   border-radius: var(--r-lg);

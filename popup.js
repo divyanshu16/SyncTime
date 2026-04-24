@@ -75,6 +75,111 @@ const TZ_DB = [
   { id: 'Australia/Perth',                city: 'Perth',              region: 'Australia West',     search: 'awst western australia' },
   { id: 'Pacific/Auckland',               city: 'Auckland',           region: 'New Zealand',        search: 'nzst nzdt wellington' },
   { id: 'Pacific/Fiji',                   city: 'Suva',               region: 'Fiji',               search: 'fjt' },
+  // More Americas
+  { id: 'America/Caracas',               city: 'Caracas',            region: 'Venezuela',          search: 'vet' },
+  { id: 'America/Havana',                city: 'Havana',             region: 'Cuba',               search: 'cst cdt' },
+  { id: 'America/Puerto_Rico',           city: 'San Juan',           region: 'Puerto Rico',        search: 'ast puerto rico' },
+  { id: 'America/Montevideo',            city: 'Montevideo',         region: 'Uruguay',            search: 'uyt' },
+  { id: 'America/Asuncion',             city: 'Asunción',           region: 'Paraguay',           search: 'pyt pyst' },
+  { id: 'America/La_Paz',               city: 'La Paz',             region: 'Bolivia',            search: 'bot' },
+  { id: 'America/Guayaquil',            city: 'Quito / Guayaquil',  region: 'Ecuador',            search: 'ect' },
+  { id: 'America/Panama',               city: 'Panama City',        region: 'Panama',             search: 'est' },
+  { id: 'America/Costa_Rica',           city: 'San José',           region: 'Costa Rica',         search: 'cst' },
+  { id: 'America/Tegucigalpa',          city: 'Tegucigalpa',        region: 'Honduras',           search: 'cst' },
+  { id: 'America/Guatemala',            city: 'Guatemala City',     region: 'Guatemala',          search: 'cst' },
+  { id: 'America/El_Salvador',          city: 'San Salvador',       region: 'El Salvador',        search: 'cst' },
+  { id: 'America/Managua',              city: 'Managua',            region: 'Nicaragua',          search: 'cst' },
+  { id: 'America/Port-au-Prince',       city: 'Port-au-Prince',     region: 'Haiti',              search: 'est edt' },
+  { id: 'America/Santo_Domingo',        city: 'Santo Domingo',      region: 'Dominican Republic', search: 'ast' },
+  { id: 'America/Jamaica',              city: 'Kingston',           region: 'Jamaica',            search: 'est' },
+  { id: 'America/Port_of_Spain',        city: 'Port of Spain',      region: 'Trinidad',           search: 'ast' },
+  { id: 'America/Paramaribo',           city: 'Paramaribo',         region: 'Suriname',           search: 'srt' },
+  { id: 'America/Cayenne',              city: 'Cayenne',            region: 'French Guiana',      search: 'gft' },
+  { id: 'America/Belize',               city: 'Belmopan',           region: 'Belize',             search: 'cst' },
+  { id: 'America/Nassau',               city: 'Nassau',             region: 'Bahamas',            search: 'est edt' },
+  { id: 'America/Barbados',             city: 'Bridgetown',         region: 'Barbados',           search: 'ast' },
+  // More Europe
+  { id: 'Europe/Dublin',                city: 'Dublin',             region: 'Ireland',            search: 'ist wet gmt' },
+  { id: 'Europe/Reykjavik',             city: 'Reykjavik',          region: 'Iceland',            search: 'gmt' },
+  { id: 'Europe/Brussels',              city: 'Brussels',           region: 'Belgium',            search: 'cet cest' },
+  { id: 'Europe/Vienna',                city: 'Vienna',             region: 'Austria',            search: 'cet cest' },
+  { id: 'Europe/Budapest',              city: 'Budapest',           region: 'Hungary',            search: 'cet cest' },
+  { id: 'Europe/Bucharest',             city: 'Bucharest',          region: 'Romania',            search: 'eet eest' },
+  { id: 'Europe/Sofia',                 city: 'Sofia',              region: 'Bulgaria',           search: 'eet eest' },
+  { id: 'Europe/Belgrade',              city: 'Belgrade',           region: 'Serbia',             search: 'cet cest' },
+  { id: 'Europe/Zagreb',                city: 'Zagreb',             region: 'Croatia',            search: 'cet cest' },
+  { id: 'Europe/Skopje',                city: 'Skopje',             region: 'North Macedonia',    search: 'cet cest' },
+  { id: 'Europe/Sarajevo',              city: 'Sarajevo',           region: 'Bosnia',             search: 'cet cest' },
+  { id: 'Europe/Tirane',                city: 'Tirana',             region: 'Albania',            search: 'cet cest' },
+  { id: 'Europe/Riga',                  city: 'Riga',               region: 'Latvia',             search: 'eet eest' },
+  { id: 'Europe/Tallinn',               city: 'Tallinn',            region: 'Estonia',            search: 'eet eest' },
+  { id: 'Europe/Vilnius',               city: 'Vilnius',            region: 'Lithuania',          search: 'eet eest' },
+  { id: 'Europe/Minsk',                 city: 'Minsk',              region: 'Belarus',            search: 'fmt' },
+  { id: 'Europe/Chisinau',              city: 'Chișinău',           region: 'Moldova',            search: 'eet eest' },
+  { id: 'Europe/Nicosia',               city: 'Nicosia',            region: 'Cyprus',             search: 'eet eest' },
+  { id: 'Europe/Luxembourg',            city: 'Luxembourg',         region: 'Luxembourg',         search: 'cet cest' },
+  { id: 'Europe/Valletta',              city: 'Valletta',           region: 'Malta',              search: 'cet cest' },
+  { id: 'Atlantic/Cape_Verde',          city: 'Praia',              region: 'Cape Verde',         search: 'cvt' },
+  // More Africa
+  { id: 'Africa/Accra',                 city: 'Accra',              region: 'Ghana',              search: 'gmt' },
+  { id: 'Africa/Abidjan',               city: 'Abidjan',            region: 'Côte d\'Ivoire',    search: 'gmt' },
+  { id: 'Africa/Dakar',                 city: 'Dakar',              region: 'Senegal',            search: 'gmt' },
+  { id: 'Africa/Tunis',                 city: 'Tunis',              region: 'Tunisia',            search: 'cet' },
+  { id: 'Africa/Algiers',               city: 'Algiers',            region: 'Algeria',            search: 'cet' },
+  { id: 'Africa/Tripoli',               city: 'Tripoli',            region: 'Libya',              search: 'eet' },
+  { id: 'Africa/Khartoum',              city: 'Khartoum',           region: 'Sudan',              search: 'cat' },
+  { id: 'Africa/Addis_Ababa',           city: 'Addis Ababa',        region: 'Ethiopia',           search: 'eat' },
+  { id: 'Africa/Kampala',               city: 'Kampala',            region: 'Uganda',             search: 'eat' },
+  { id: 'Africa/Dar_es_Salaam',         city: 'Dar es Salaam',      region: 'Tanzania',           search: 'eat' },
+  { id: 'Africa/Lusaka',                city: 'Lusaka',             region: 'Zambia',             search: 'cat' },
+  { id: 'Africa/Harare',                city: 'Harare',             region: 'Zimbabwe',           search: 'cat' },
+  { id: 'Africa/Maputo',                city: 'Maputo',             region: 'Mozambique',         search: 'cat' },
+  { id: 'Africa/Windhoek',              city: 'Windhoek',           region: 'Namibia',            search: 'cat' },
+  { id: 'Africa/Kinshasa',              city: 'Kinshasa',           region: 'DR Congo',           search: 'wat cat' },
+  { id: 'Africa/Brazzaville',           city: 'Brazzaville',        region: 'Congo',              search: 'wat' },
+  { id: 'Africa/Luanda',                city: 'Luanda',             region: 'Angola',             search: 'wat' },
+  { id: 'Africa/Douala',                city: 'Yaoundé / Douala',   region: 'Cameroon',           search: 'wat' },
+  { id: 'Africa/Bamako',                city: 'Bamako',             region: 'Mali',               search: 'gmt' },
+  { id: 'Africa/Conakry',               city: 'Conakry',            region: 'Guinea',             search: 'gmt' },
+  { id: 'Africa/Freetown',              city: 'Freetown',           region: 'Sierra Leone',       search: 'gmt' },
+  { id: 'Africa/Monrovia',              city: 'Monrovia',           region: 'Liberia',            search: 'gmt' },
+  // More Middle East
+  { id: 'Asia/Amman',                   city: 'Amman',              region: 'Jordan',             search: 'eet eest' },
+  { id: 'Asia/Baghdad',                 city: 'Baghdad',            region: 'Iraq',               search: 'ast' },
+  { id: 'Asia/Kuwait',                  city: 'Kuwait City',        region: 'Kuwait',             search: 'ast' },
+  { id: 'Asia/Muscat',                  city: 'Muscat',             region: 'Oman',               search: 'gst' },
+  { id: 'Asia/Bahrain',                 city: 'Manama',             region: 'Bahrain',            search: 'ast' },
+  { id: 'Asia/Aden',                    city: 'Sanaa',              region: 'Yemen',              search: 'ast' },
+  { id: 'Asia/Kabul',                   city: 'Kabul',              region: 'Afghanistan',        search: 'aft' },
+  { id: 'Asia/Ashgabat',               city: 'Ashgabat',           region: 'Turkmenistan',       search: 'tmt' },
+  { id: 'Asia/Baku',                    city: 'Baku',               region: 'Azerbaijan',         search: 'azt' },
+  { id: 'Asia/Tbilisi',                 city: 'Tbilisi',            region: 'Georgia',            search: 'get' },
+  { id: 'Asia/Yerevan',                 city: 'Yerevan',            region: 'Armenia',            search: 'amt' },
+  // More Central/South Asia
+  { id: 'Asia/Bishkek',                 city: 'Bishkek',            region: 'Kyrgyzstan',         search: 'kgt' },
+  { id: 'Asia/Dushanbe',                city: 'Dushanbe',           region: 'Tajikistan',         search: 'tjt' },
+  // More East/SE Asia
+  { id: 'Asia/Ulaanbaatar',            city: 'Ulaanbaatar',        region: 'Mongolia',           search: 'ulat' },
+  { id: 'Asia/Phnom_Penh',             city: 'Phnom Penh',         region: 'Cambodia',           search: 'ict' },
+  { id: 'Asia/Vientiane',              city: 'Vientiane',          region: 'Laos',               search: 'ict' },
+  { id: 'Asia/Rangoon',                city: 'Yangon',             region: 'Myanmar',            search: 'mmt naypyidaw' },
+  { id: 'Asia/Brunei',                 city: 'Bandar Seri Begawan',region: 'Brunei',             search: 'bnt' },
+  { id: 'Asia/Dili',                   city: 'Dili',               region: 'Timor-Leste',        search: 'tlt' },
+  { id: 'Pacific/Port_Moresby',        city: 'Port Moresby',       region: 'Papua New Guinea',   search: 'pgt' },
+  { id: 'Pacific/Honiara',             city: 'Honiara',            region: 'Solomon Islands',    search: 'sbt' },
+  { id: 'Pacific/Noumea',              city: 'Nouméa',             region: 'New Caledonia',      search: 'nct' },
+  { id: 'Pacific/Tongatapu',           city: 'Nuku\'alofa',        region: 'Tonga',              search: 'tot' },
+  { id: 'Pacific/Apia',                city: 'Apia',               region: 'Samoa',              search: 'wst' },
+  { id: 'Pacific/Tahiti',              city: 'Papeete',            region: 'French Polynesia',   search: 'taht' },
+  { id: 'Pacific/Guam',                city: 'Hagåtña',            region: 'Guam',               search: 'chst' },
+  { id: 'Pacific/Pago_Pago',           city: 'Pago Pago',          region: 'American Samoa',     search: 'sst' },
+  // More Russia
+  { id: 'Asia/Yekaterinburg',          city: 'Yekaterinburg',      region: 'Russia (Ural)',      search: 'yekt' },
+  { id: 'Asia/Novosibirsk',            city: 'Novosibirsk',        region: 'Russia (Siberia)',   search: 'novt' },
+  { id: 'Asia/Krasnoyarsk',            city: 'Krasnoyarsk',        region: 'Russia',             search: 'krat' },
+  { id: 'Asia/Irkutsk',               city: 'Irkutsk',            region: 'Russia',             search: 'irkt' },
+  { id: 'Asia/Vladivostok',           city: 'Vladivostok',        region: 'Russia (Far East)',  search: 'vlat' },
+  { id: 'Asia/Magadan',               city: 'Magadan',            region: 'Russia',             search: 'magt' },
   // UTC
   { id: 'UTC',                            city: 'UTC',                region: 'Universal Time',     search: 'utc gmt zulu universal' },
 ];
@@ -416,6 +521,8 @@ function renderCards() {
 function attachCardHandlers(container) {
   // Remove buttons
   container.querySelectorAll('.card-remove').forEach(btn => {
+    // Stop mousedown propagation so the card's drag handler doesn't eat the click
+    btn.addEventListener('mousedown', e => e.stopPropagation());
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const tzId = btn.dataset.tz;
@@ -462,7 +569,7 @@ function attachCardHandlers(container) {
         updateConverterHint();
       };
 
-      input.addEventListener('input',   () => applyEdit(input.value));
+      input.addEventListener('change', () => applyEdit(input.value));
       input.addEventListener('keydown', e => {
         if (e.key === 'Enter')  { e.preventDefault(); applyEdit(input.value); }
         if (e.key === 'Escape') { renderCards(); }
