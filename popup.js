@@ -519,20 +519,6 @@ function renderCards() {
 }
 
 function attachCardHandlers(container) {
-  // Remove buttons — use event delegation on the container so z-index/stacking
-  // issues on the button itself cannot block the click from reaching a handler.
-  container.addEventListener('click', e => {
-    const btn = e.target.closest('.card-remove');
-    if (!btn) return;
-    e.stopPropagation();
-    const tzId = btn.dataset.tz;
-    if (!tzId) return;
-    state.pinned = state.pinned.filter(p => p.id !== tzId);
-    save();
-    renderCards();
-    refreshConverterSelect();
-  });
-
   // Click time → inline edit: set this TZ as converter source, all cards update
   container.querySelectorAll('.card-time').forEach(el => {
     el.title = 'Click to set time here';
@@ -1045,6 +1031,22 @@ function init() {
   if (!state.converterFrom) {
     state.converterFrom = localTz();
   }
+
+  // Remove buttons — delegated once on the persistent #cards container so
+  // z-index/stacking issues can't block clicks, and it doesn't accumulate on
+  // every renderCards() call.
+  const cardsEl = document.getElementById('cards');
+  cardsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.card-remove');
+    if (!btn) return;
+    e.stopPropagation();
+    const tzId = btn.dataset.tz;
+    if (!tzId) return;
+    state.pinned = state.pinned.filter(p => p.id !== tzId);
+    save();
+    renderCards();
+    refreshConverterSelect();
+  });
 
   renderCards();
   setupSort();
