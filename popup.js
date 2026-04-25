@@ -481,7 +481,7 @@ function renderCards() {
 
     const card = document.createElement('div');
     card.className = `card ${cls}${isLocal ? ' local' : ''} ${skyClass}`;
-    card.draggable = state.sortMode === 'custom';
+    card.draggable = false; // enabled dynamically on mousedown (see setupDragAndDrop)
     card.dataset.idx = idx;
     card.dataset.tzId = tzId;
     card.style.background = skyGradient(hr);
@@ -609,15 +609,14 @@ function setupDragAndDrop() {
   let dragIdx = null;
 
   cards.forEach(card => {
-    // Disable drag for the full press when the user presses the remove button.
-    // setTimeout(0) restores too early (before mouseup), so we restore on mouseup
-    // at the document level instead, covering hold-and-release and slow clicks.
+    // Enable dragging only when the press starts on a non-interactive part of the
+    // card. Buttons, inputs, and contenteditable elements need their own clicks
+    // to work; making the whole card draggable=true causes Chrome to intercept
+    // mousedown and suppress the click on those children.
     card.addEventListener('mousedown', e => {
-      if (e.target.closest('.card-remove')) {
-        card.draggable = false;
-        document.addEventListener('mouseup', () => {
-          card.draggable = state.sortMode === 'custom';
-        }, { once: true });
+      const interactive = e.target.closest('button, input, [contenteditable]');
+      if (!interactive && state.sortMode === 'custom') {
+        card.draggable = true;
       }
     });
     card.addEventListener('dragstart', e => {
@@ -626,6 +625,7 @@ function setupDragAndDrop() {
       setTimeout(() => card.classList.add('dragging'), 0);
     });
     card.addEventListener('dragend', () => {
+      card.draggable = false;
       card.classList.remove('dragging');
       document.querySelectorAll('#cards .card').forEach(c => c.classList.remove('drag-over'));
     });
