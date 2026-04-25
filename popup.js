@@ -610,13 +610,15 @@ function setupDragAndDrop() {
 
   cards.forEach(card => {
     // Enable dragging only when the press starts on a non-interactive part of the
-    // card. Buttons, inputs, and contenteditable elements need their own clicks
-    // to work; making the whole card draggable=true causes Chrome to intercept
-    // mousedown and suppress the click on those children.
+    // card. Interactive elements (buttons, inputs, contenteditable, .card-time)
+    // must receive their own click events unimpeded.
+    // Also reset draggable on mouseup so a plain click (no drag) doesn't leave
+    // the card stuck as draggable — dragend only fires when a drag actually occurs.
     card.addEventListener('mousedown', e => {
-      const interactive = e.target.closest('button, input, [contenteditable]');
+      const interactive = e.target.closest('button, input, [contenteditable], .card-time');
       if (!interactive && state.sortMode === 'custom') {
         card.draggable = true;
+        document.addEventListener('mouseup', () => { card.draggable = false; }, { once: true });
       }
     });
     card.addEventListener('dragstart', e => {
